@@ -4,3 +4,4 @@ flask-migrate
 sqlalchemy
 gunicorn
 werkzeug
+flask-wtf
