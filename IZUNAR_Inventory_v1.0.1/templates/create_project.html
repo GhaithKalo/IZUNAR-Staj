@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 800px;">
+  <div class="card shadow-lg rounded-4 p-5 bg-white">
+    <h2 class="mb-4 text-primary fw-bold">Yeni Proje Oluştur</h2>
+
+    <form method="POST" action="{{ url_for('create_project') }}">
+      <!-- Proje Bilgileri -->
+      <div class="mb-4">
+        <label for="project_name" class="form-label fw-semibold">Proje Adı</label>
+        <input type="text" class="form-control" id="project_name" name="name" placeholder="Proje adını giriniz" required>
+      </div>
+
+      <div class="mb-4">
+        <label for="project_description" class="form-label fw-semibold">Proje Açıklaması</label>
+        <textarea class="form-control" id="project_description" name="description" rows="3" placeholder="Proje hakkında açıklama" required></textarea>
+      </div>
+
+      <div class="mb-4">
+        <label for="project_location" class="form-label fw-semibold">Proje Konumu</label>
+        <input type="text" class="form-control" id="project_location" name="location" placeholder="Proje konumunu giriniz" required>
+      </div>
+
+      <!-- Malzeme Seçim Bölümü -->
+      <div class="mb-4">
+        <label class="form-label fw-semibold">Malzeme Seçimi</label>
+        
+        <!-- Arama Çubuğu -->
+        <div class="input-group mb-3">
+          <span class="input-group-text bg-white"><i class="bi bi-search text-secondary"></i></span>
+          <input type="search" id="component_search" class="form-control" placeholder="Malzeme ara...">
+          <button class="btn btn-outline-secondary" type="button" id="clear_search">Temizle</button>
+        </div>
+
+        <!-- Malzeme Listesi -->
+        <div class="card border-0 shadow-sm">
+          <div class="card-body p-0">
+            <div class="accordion" id="componentsAccordion">
+              {% for category, items in components.items() %}
+              <div class="accordion-item border-0">
+                <h3 class="accordion-header">
+                  <button class="accordion-button collapsed fw-semibold" type="button" 
+                          data-bs-toggle="collapse" data-bs-target="#collapse{{ loop.index }}"
+                          aria-expanded="false" aria-controls="collapse{{ loop.index }}">
+                    <i class="bi bi-folder-fill me-2 text-warning"></i>
+                    {{ category }}
+                    <span class="badge bg-primary ms-2">{{ items|length }}</span>
+                  </button>
+                </h3>
+                <div id="collapse{{ loop.index }}" class="accordion-collapse collapse" 
+                     data-bs-parent="#componentsAccordion">
+                  <div class="accordion-body pt-0">
+                    {% for component in items %}
+                    <div class="d-flex align-items-center justify-content-between py-2 border-bottom component-item">
+                      <div class="form-check">
+                        <input class="form-check-input component-checkbox" type="checkbox" 
+                               id="comp{{ component.id }}" name="component_{{ component.id }}">
+                        <label class="form-check-label" for="comp{{ component.id }}">
+                          {{ component.name }}
+                        </label>
+                      </div>
+                      <div class="input-group" style="width: 120px;">
+                        <button class="btn btn-outline-secondary decrement-btn" type="button">-</button>
+                        <input type="number" class="form-control text-center quantity-input" 
+                               name="amount_{{ component.id }}" min="1" value="1" disabled>
+                        <button class="btn btn-outline-secondary increment-btn" type="button">+</button>
+                      </div>
+                    </div>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-lg w-100 mt-3">
+        <i class="bi bi-check2-circle me-2"></i> Projeyi Oluştur ve Malzemeleri Ödünç Al
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+  .accordion-button {
+    background-color: #f8f9fa;
+    transition: all 0.2s ease;
+  }
+  .accordion-button:not(.collapsed) {
+    background-color: #e9ecef;
+    color: #0d6efd;
+  }
+  .accordion-button::after {
+    background-size: 1rem;
+  }
+  .component-item {
+    transition: all 0.2s ease;
+  }
+  .quantity-input {
+    max-width: 50px;
+  }
+  .quantity-input:disabled {
+    background-color: #f8f9fa;
+    cursor: not-allowed;
+  }
+  .input-group-text {
+    border-right: none;
+  }
+  #component_search {
+    border-left: none;
+  }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Checkbox etkinleştirme / devre dışı bırakma ve miktar inputunu kontrol etme
+  document.addEventListener('change', function(e) {
+    if (e.target.classList.contains('component-checkbox')) {
+      const qtyInput = e.target.closest('.component-item').querySelector('.quantity-input');
+      if (e.target.checked) {
+        qtyInput.disabled = false;
+        qtyInput.value = 0; // Seçince 1 yap
+      } else {
+        qtyInput.disabled = true;
+        qtyInput.value = 1; // Seçim kaldırılınca 1 yap ve disabled et
+      }
+    }
+  });
+
+  // Miktar artırma/azaltma fonksiyonları
+  function handleQuantityChange(e) {
+    const input = e.target.closest('.input-group').querySelector('.quantity-input');
+
+    // Eğer input disabled ise hiçbir işlem yapma
+    if (input.disabled) return;
+
+    let value = parseInt(input.value);
+    if (isNaN(value) || value < 1) value = 1;
+
+    if (e.target.classList.contains('increment-btn')) {
+      input.value = value + 1;
+    } else if (e.target.classList.contains('decrement-btn')) {
+      input.value = value > 1 ? value - 1 : 1;
+    }
+
+    // Opsiyonel: input eventini tetikle (gerekmeyebilir)
+    input.dispatchEvent(new Event('input'));
+  }
+
+  // Artırma/azaltma butonlarına event listener ekleme
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('increment-btn') || e.target.classList.contains('decrement-btn')) {
+      handleQuantityChange(e);
+    }
+  });
+
+  // Arama fonksiyonu
+  const searchInput = document.getElementById('component_search');
+  const clearSearch = document.getElementById('clear_search');
+  
+  searchInput.addEventListener('input', function() {
+    const term = this.value.toLowerCase().trim();
+
+    // Önce tüm kategori collapse'larını kapat
+    document.querySelectorAll('.accordion-collapse').forEach(collapse => {
+      const bsCollapse = bootstrap.Collapse.getInstance(collapse);
+      if (bsCollapse) bsCollapse.hide();
+    });
+
+    document.querySelectorAll('.component-item').forEach(item => {
+      const label = item.querySelector('label').textContent.toLowerCase();
+      const match = label.includes(term);
+      item.style.display = match ? 'flex' : 'none';
+
+      if (match) {
+        // İlgili kategoriyi aç
+        const collapse = item.closest('.accordion-collapse');
+        if (collapse) {
+          let bsCollapse = bootstrap.Collapse.getInstance(collapse);
+          if (!bsCollapse) {
+            bsCollapse = new bootstrap.Collapse(collapse, {toggle: false});
+          }
+          bsCollapse.show();
+        }
+      }
+    });
+
+    clearSearch.style.visibility = term ? 'visible' : 'hidden';
+  });
+
+  clearSearch.addEventListener('click', function() {
+    searchInput.value = '';
+    searchInput.dispatchEvent(new Event('input'));
+  });
+
+  // Başlangıçta temizle butonunu gizle
+  clearSearch.style.visibility = 'hidden';
+});
+</script>
+{% endblock %}

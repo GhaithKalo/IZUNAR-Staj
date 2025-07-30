@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8" />
+    <title>Kayıt Ol</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body { font-family: Arial, sans-serif; padding: 1em; max-width: 400px; margin: auto; }
+      input, button { width: 100%; padding: 0.5em; margin: 0.5em 0; }
+    </style>
+</head>
+<body>
+    <h1>Kayıt Ol</h1>
+    <form method="post" action="{{ url_for('register') }}">
+        <input type="text" name="username" placeholder="Kullanıcı adı" required />
+        <input type="password" name="password" placeholder="Şifre" required />
+        <button type="submit">Kayıt Ol</button>
+    </form>
+    <p>Zaten hesabın var mı? <a href="{{ url_for('login') }}">Giriş yap</a></p>
+</body>
+</html>
+

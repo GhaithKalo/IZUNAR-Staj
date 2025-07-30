@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% block title %}{{ component.name }} ({{ component.code or 'Kodsuz' }}) - Bileşen Detayı{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="card shadow-sm p-4 border-0 rounded-3" style="background-color: #f9f9f9;">
+        <div class="row g-4">
+            <div class="col-md-4 text-center">
+                <img src="{{ component.image_url or 'https://via.placeholder.com/300' }}" 
+                     class="img-fluid rounded shadow-sm" alt="{{ component.name }}">
+            </div>
+            <div class="col-md-8">
+                <h2 class="fw-bold text-primary">{{ component.name }}</h2>
+
+                <!-- Bileşen Kodu -->
+                <p><strong>Kod:</strong> {{ component.code if component.code else 'Belirtilmemiş' }}</p>
+
+                <p><strong>Tür:</strong> {{ component.type }}</p>
+
+                <!-- Etiketler -->
+                {% if component.tags %}
+                  <p><strong>Etiketler:</strong> 
+                    {% for tag in component.tags %}
+                      <span class="badge bg-info text-dark me-1">{{ tag.name }}</span>
+                    {% endfor %}
+                  </p>
+                {% endif %}
+
+                <p><strong>Konum:</strong> {{ component.location }}</p>
+                <p><strong>Açıklama:</strong> {{ component.description }}</p>
+                <p>Stok: <strong class="text-success">{{ component.quantity }}</strong></p>
+
+                {% if current_user.role == 'admin' %}
+                <!-- Stok Güncelleme Formu -->
+                <form method="POST" action="{{ url_for('update_stock', comp_id=component.id) }}" 
+                      class="d-inline-flex align-items-center gap-2 mt-3 flex-wrap">
+                    <input type="hidden" id="action-input" name="action" value="">
+                    <input type="number" name="amount" id="amount-input" value="1" min="1" 
+                           class="form-control form-control-sm" style="width: 80px;" required>
+
+                    <div class="btn-group" role="group" aria-label="Stok Güncelle">
+                        <button type="submit" onclick="setAction('decrease')" class="btn btn-outline-danger">
+                            <i class="bi bi-dash-circle-fill"></i> Azalt
+                        </button>
+                        <button type="submit" onclick="setAction('increase')" class="btn btn-outline-success">
+                            <i class="bi bi-plus-circle-fill"></i> Arttır
+                        </button>
+                    </div>
+                </form>
+
+                <hr class="my-4">
+
+                <!-- Ödünç Alma Geçmişi -->
+                <h4 class="text-secondary fw-semibold">Ödünç Alma Geçmişi</h4>
+                {% if borrow_history %}
+                <div class="table-responsive mt-3 mb-4">
+                    <table class="table table-striped table-bordered align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Kullanıcı</th>
+                                <th>Ödünç Alınma Tarihi</th>
+                                <th>Miktar</th>
+                                <th>İade Tarihi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in borrow_history %}
+                            <tr>
+                                <td>{{ record.user_name }}</td>
+                                <td>{{ record.borrow_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>{{ record.amount }}</td>
+                                <td>
+                                    {% if record.return_date %}
+                                        {{ record.return_date.strftime('%Y-%m-%d %H:%M') }}
+                                    {% else %}
+                                        <span class="text-danger fst-italic">Henüz iade edilmedi</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted mt-3">Henüz ödünç alma geçmişi bulunmamaktadır.</p>
+                {% endif %}
+
+                <!-- Sarf Etme Geçmişi -->
+                <hr class="my-4">
+                <h4 class="text-secondary fw-semibold">Sarf Etme Geçmişi</h4>
+                {% if consume_history %}
+                <div class="table-responsive mt-3">
+                    <table class="table table-striped table-bordered align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Kullanıcı</th>
+                                <th>Sarf Etme Tarihi</th>
+                                <th>Miktar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in consume_history %}
+                            <tr>
+                                <td>{{ record.user_name }}</td>
+                                <td>{{ record.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>{{ record.amount }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted mt-3">Henüz sarf etme geçmişi bulunmamaktadır.</p>
+                {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function setAction(action) {
+        document.getElementById('action-input').value = action;
+    }
+</script>
+{% endblock %}
+

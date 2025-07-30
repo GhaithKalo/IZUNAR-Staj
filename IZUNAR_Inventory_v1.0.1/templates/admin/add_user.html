@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Yeni Kullanıcı Ekle{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Yeni Kullanıcı Ekle</h2>
+
+    <form method="POST">
+        <div class="mb-3">
+            <label for="username" class="form-label">Kullanıcı Adı</label>
+            <input type="text" class="form-control" id="username" name="username" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="password" class="form-label">Şifre</label>
+            <input type="password" class="form-control" id="password" name="password" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="role" class="form-label">Rol</label>
+            <select id="role" name="role" class="form-select">
+                <option value="user" selected>Kullanıcı</option>
+                <option value="admin">Admin</option>
+            </select>
+        </div>
+
+        <div class="form-check mb-3">
+            <input type="checkbox" class="form-check-input" id="can_add_product" name="can_add_product">
+            <label class="form-check-label" for="can_add_product">Ürün ekleme yetkisi</label>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Ekle</button>
+        <a href="{{ url_for('manage_users') }}" class="btn btn-secondary">İptal</a>
+    </form>
+</div>
+{% endblock %}

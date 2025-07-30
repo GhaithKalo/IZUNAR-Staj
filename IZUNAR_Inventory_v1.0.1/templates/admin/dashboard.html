@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="card shadow-lg rounded-4 p-5 bg-white">
+    <h1 class="mb-3 text-primary fw-bold">Admin Paneline Hoşgeldiniz</h1>
+    <p class="lead text-muted mb-4">
+      Sistem ayarları, kullanıcı yönetimi ve diğer yönetimsel işlemleri buradan kolayca gerçekleştirebilirsiniz.
+    </p>
+    <a href="{{ url_for('add_user') }}" class="btn btn-success btn-lg mb-4">
+      <i class="bi bi-person-plus-fill me-2"></i> Yeni Kullanıcı Ekle
+    </a>
+
+    <h4 class="mb-3 text-secondary fw-semibold">Yönetim Menüsü</h4>
+    <div class="list-group">
+      <a href="{{ url_for('admin_projects') }}" class="list-group-item list-group-item-action d-flex align-items-center gap-3">
+        <i class="bi bi-folder2-open fs-5 text-primary"></i> Projeler
+      </a>
+      <a href="{{ url_for('manage_users') }}" class="list-group-item list-group-item-action d-flex align-items-center gap-3">
+        <i class="bi bi-people-fill fs-5 text-success"></i> Kullanıcı Yönetimi
+      </a>
+      <a href="{{ url_for('component_list') }}" class="list-group-item list-group-item-action d-flex align-items-center gap-3">
+        <i class="bi bi-cpu-fill fs-5 text-warning"></i> Bileşenler
+      </a>
+      <a href="{{ url_for('admin_requests') }}" class="list-group-item list-group-item-action d-flex align-items-center gap-3">
+        <i class="bi bi-card-checklist fs-5 text-info"></i> İstekler
+      </a>
+      <a href="{{ url_for('low_stock') }}" class="list-group-item list-group-item-action d-flex align-items-center gap-3">
+        <i class="bi bi-exclamation-triangle-fill fs-5 text-danger"></i> Azalan Stoklar
+      </a>
+      <!-- İsterseniz buraya başka linkler ekleyebilirsiniz -->
+    </div>
+  </div>
+</div>
+{% endblock %}

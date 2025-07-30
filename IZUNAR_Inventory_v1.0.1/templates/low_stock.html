@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-4">
+  <h2 class="mb-4 text-danger fw-bold">Azalan Stoklar</h2>
+
+  {% if components %}
+  <div class="list-group">
+    {% for comp in components %}
+    <div class="list-group-item d-flex justify-content-between align-items-center shadow-sm rounded mb-2">
+      <div>
+        <h5 class="mb-0">{{ comp.name }}</h5>
+      </div>
+      <div>
+        <span class="badge bg-warning text-dark fs-6 me-3">{{ comp.quantity }}</span>
+        <span class="text-danger fw-semibold">Stok tükeniyor / Satın alınmalı!</span>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="alert alert-success" role="alert">
+    Tüm ürünlerin stoğu yeterli.
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

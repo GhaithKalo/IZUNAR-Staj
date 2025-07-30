@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="tr" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Parça İade Et - {{ component.name }}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-6">
+  <div class="bg-white shadow-md rounded-lg max-w-md w-full p-8">
+    <h1 class="text-2xl font-semibold mb-6 text-center text-gray-800">📥 {{ component.name }} Parçası İade Et</h1>
+
+    <form method="post" class="space-y-6">
+      <div>
+        <label for="user_name" class="block mb-1 font-medium text-gray-700">Adınız</label>
+        <input 
+          id="user_name" 
+          name="user_name" 
+          type="text" 
+          placeholder="Adınızı giriniz" 
+          required 
+          class="w-full p-3 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
+        />
+      </div>
+
+      <div>
+        <label for="amount" class="block mb-1 font-medium text-gray-700">Kaç Adet?</label>
+        <input 
+          id="amount" 
+          name="amount" 
+          type="number" 
+          placeholder="Adet sayısını giriniz" 
+          required 
+          min="1"
+          max="{{ component.quantity + 10 }}" <!-- örnek max, isteğe göre ayarlanabilir -->
+          class="w-full p-3 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
+        />
+      </div>
+
+      <button 
+        type="submit" 
+        class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+      >
+        İade Et
+      </button>
+    </form>
+
+    <div class="mt-4 text-center">
+      <a href="{{ url_for('index') }}" class="text-blue-500 hover:underline">Ana sayfaya dön</a>
+    </div>
+  </div>
+</body>
+</html>
+
