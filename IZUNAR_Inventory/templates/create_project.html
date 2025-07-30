@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4" style="max-width: 600px;">
+  <h2 class="mb-4">Yeni Proje Oluştur</h2>
+  <form method="POST" action="{{ url_for('create_project') }}">
+    <!-- CSRF token kaldırıldı -->
+
+    <div class="mb-3">
+      <label for="project_name" class="form-label">Proje Adı</label>
+      <input type="text" class="form-control" id="project_name" name="name" placeholder="Proje adını giriniz" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="project_description" class="form-label">Proje Açıklaması</label>
+      <textarea class="form-control" id="project_description" name="description" rows="3" placeholder="Proje hakkında açıklama" required></textarea>
+    </div>
+
+    <div class="mb-3">
+      <label for="project_location" class="form-label">Proje Konumu</label>
+      <input type="text" class="form-control" id="project_location" name="location" placeholder="Proje konumunu giriniz" required>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Kullanılacak Malzemeler</label>
+      <select id="components" name="components" multiple="multiple" style="width: 100%;">
+        {% for component in components %}
+          <option value="{{ component.id }}">{{ component.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Projeyi Oluştur ve Malzemeleri Ödünç Al</button>
+  </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- select2 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <!-- select2 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+  <script>
+    $(document).ready(function() {
+      $('#components').select2({
+        placeholder: "Malzemeleri seçin",
+        allowClear: true,
+        width: '100%',
+        closeOnSelect: false,  // Çoklu seçimde kutuyu açık tutar
+        dropdownAutoWidth: true
+      });
+    });
+
+    // Bootstrap alert dismiss functionality
+    document.addEventListener('DOMContentLoaded', function () {
+      var alerts = document.querySelectorAll('.alert-dismissible');
+      alerts.forEach(function (alert) {
+        alert.querySelector('.btn-close').addEventListener('click', function () {
+          alert.style.display = 'none';
+        });
+      });
+    });
+  </script>
+
+  <style>
+    /* select2 kutusunun yüksekliğini artır */
+    .select2-container--default .select2-selection--multiple {
+      min-height: 45px;
+      padding: 0.25rem 0.5rem;
+    }
+    /* İçerideki seçimlerin daha rahat görünmesi için */
+    .select2-selection__choice {
+      font-size: 0.9rem;
+      padding: 2px 8px;
+    }
+  </style>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Projeyi Güncelle</h2>
+  <form method="POST">
+    <div class="mb-3">
+      <label>Proje Adı</label>
+      <input type="text" name="name" class="form-control" value="{{ project.name }}" required>
+    </div>
+    <div class="mb-3">
+      <label>Açıklama</label>
+      <textarea name="description" class="form-control">{{ project.description }}</textarea>
+    </div>
+    <div class="mb-3">
+      <label>Konum</label>
+      <input type="text" name="location" class="form-control" value="{{ project.location }}">
+    </div>
+
+    <div class="mb-3">
+      <label>Durum</label>
+      <input type="text" class="form-control" value="{{ project.status }}" disabled>
+      <!-- Ayrıca statüyü gizli alan olarak da POST edebiliriz -->
+      <input type="hidden" name="status" value="{{ project.status }}">
+    </div>
+
+    <hr>
+    <h5>Malzemeleri Düzenle</h5>
+    {% for item in project.items %}
+      <div class="mb-3 border rounded p-3">
+        <strong>{{ item.component.name }}</strong>
+        <input type="hidden" name="item_id_{{ loop.index }}" value="{{ item.id }}">
+        <input type="number" name="item_amount_{{ loop.index }}" class="form-control mt-2" value="{{ item.amount }}" min="0">
+      </div>
+    {% endfor %}
+    <input type="hidden" name="total_items" value="{{ project.items|length }}">
+
+    <button type="submit" class="btn btn-primary">Güncelle</button>
+  </form>
+</div>
+{% endblock %}
+

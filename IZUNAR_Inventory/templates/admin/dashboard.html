@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-sm rounded-3 p-4" style="background-color: #ffffff;">
+        <h1 class="mb-4 text-primary">Admin Paneline Hoşgeldiniz</h1>
+        <p class="lead text-secondary">
+            Burada sistem ayarları, kullanıcı yönetimi ve diğer yönetimsel işlemleri gerçekleştirebilirsiniz.
+        </p>
+        <a href="{{ url_for('add_user') }}" class="btn btn-success btn-sm">Yeni Kullanıcı Ekle</a>
+        <div class="mt-5">
+            <h4>Yönetim Menüsü</h4>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><a href="{{ url_for('admin_projects') }}">Projeler</a></li>
+                <li class="list-group-item"><a href="{{ url_for('manage_users') }}">Kullanıcı Yönetimi</a></li>
+                <li class="list-group-item"><a href="{{ url_for('component_list') }}">Bileşenler</a></li>
+                <!-- İsterseniz buraya başka linkler ekleyebilirsiniz -->
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
