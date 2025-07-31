@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+{% block title %}Yeni Bileşen Ekle{% endblock %}
+
+{% block content %}
+<!-- Yerel Selectize CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/selectize.default.css') }}">
+
+<div class="container mt-5 mb-5">
+  <div class="card shadow-sm p-4 border-0 rounded-3" style="background-color: #f9f9f9;">
+    <h2 class="fw-bold text-primary mb-4">Yeni Bileşen Ekle</h2>
+    <form method="POST" enctype="multipart/form-data" action="{{ url_for('add_component') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+      <div class="mb-3">
+        <label for="name" class="form-label">Bileşen Adı</label>
+        <input type="text" class="form-control" id="name" name="name" placeholder="Bileşen adı" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label d-block mb-2">Ürün Tipi</label>
+        <div class="d-flex justify-content-start">
+          <div class="btn-group w-50" role="group" aria-label="Ürün Tipi">
+            <input type="hidden" name="category" id="category-input" required>
+            <button type="button" class="btn btn-outline-primary w-50" id="btn-demirbas" onclick="selectCategory('demirbas')">Demirbaş</button>
+            <button type="button" class="btn btn-outline-secondary w-50" id="btn-sarf" onclick="selectCategory('sarf')">Sarf</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="type" class="form-label">Tür</label>
+        <select id="type-select" name="type" class="form-select" onchange="toggleNewTypeInput()">
+          <option value="" disabled selected>Tür seçin</option>
+          {% for t in types %}
+          <option value="{{ t }}">{{ t }}</option>
+          {% endfor %}
+          <option value="__add_new__">Yeni tür ekle...</option>
+        </select>
+      </div>
+
+      <div class="mb-3" id="new-type-div" style="display:none;">
+        <label for="new_type" class="form-label">Yeni Tür</label>
+        <input type="text" class="form-control" id="new_type" name="new_type" placeholder="Yeni tür adı">
+      </div>
+
+      <div class="form-group mb-3">
+        <label for="part_number">Parça Numarası (Opsiyonel)</label>
+        <input type="text" class="form-control" name="part_number" id="part_number">
+      </div>
+
+      <div class="mb-3">
+        <label for="location" class="form-label">Konum</label>
+        <input type="text" class="form-control" id="location" name="location" placeholder="Konum">
+      </div>
+
+      <div class="mb-3">
+        <label for="description" class="form-label">Açıklama</label>
+        <textarea class="form-control" id="description" name="description" placeholder="Açıklama"></textarea>
+      </div>
+
+      <div class="mb-3">
+        <label for="quantity" class="form-label">Stok Miktarı</label>
+        <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="0" required>
+      </div>
+
+      <!-- Yeni Etiket Ekleme ve Seçme Bölümü -->
+      <div class="mb-3">
+        <label for="tags" class="form-label">Etiketler</label>
+        
+        <div class="input-group mb-2">
+          <input type="text" id="new-tag-input" class="form-control" placeholder="Yeni etiket adı girin">
+          <button type="button" id="add-tag-button" class="btn btn-outline-secondary">Ekle</button>
+        </div>
+        
+        <select id="tags" name="tags[]" multiple class="form-control" placeholder="Etiket seçin veya ekleyin...">
+          {% for tag in existing_tags %}
+            <option value="{{ tag.id }}" {% if tag.id|string in selected_tags %}selected{% endif %}>{{ tag.name }}</option>
+          {% endfor %}
+        </select>
+        <div class="form-text">Birden fazla etiket seçebilir veya yeni etiket ekleyebilirsiniz.</div>
+      </div>
+
+      <div class="mb-3">
+        <label for="photo" class="form-label">Fotoğraf Yükle (Opsiyonel)</label>
+        <input type="file" class="form-control" id="photo" name="photo" accept="image/*">
+      </div>
+
+      <button type="submit" class="btn btn-primary">Ekle</button>
+    </form>
+  </div>
+</div>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Yerel Selectize JS -->
+<script src="{{ url_for('static', filename='js/selectize.min.js') }}"></script>
+
+<style>
+  .selectize-control.multi .selectize-input > div {
+    background-color: #0d6efd;
+    color: white;
+    border-radius: 0.375rem;
+    padding: 0.25rem 0.6rem;
+    margin: 0 4px 4px 0;
+    font-weight: 500;
+  }
+
+  .selectize-control.multi .selectize-input > div .remove {
+    color: white;
+    font-weight: bold;
+    margin-left: 6px;
+    cursor: pointer;
+  }
+</style>
+
+<style>
+  /* Ürün Tipi butonları için özel stil */
+  .btn-group[role="group"] .btn {
+    border-radius: 0 !important;
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s;
+  }
+  .btn-group[role="group"] .btn.active,
+  .btn-group[role="group"] .btn.selected {
+    background-color: #0d6efd !important;
+    color: #fff !important;
+    border-color: #0d6efd !important;
+    box-shadow: 0 2px 8px #0d6efd22;
+    z-index: 2;
+  }
+  .btn-group[role="group"] .btn:not(.active):not(.selected) {
+    background-color: #fff;
+    color: #0d6efd;
+  }
+  /* Genişlik ayarı */
+  .btn-group[role="group"] {
+    min-width: 250px;
+    max-width: 350px;
+    width: 100%;
+  }
+</style>
+
+<script>
+function toggleNewTypeInput() {
+  const typeSelect = document.getElementById('type-select');
+  const newTypeDiv = document.getElementById('new-type-div');
+  const newTypeInput = document.getElementById('new_type');
+
+  if (typeSelect.value === '__add_new__') {
+    newTypeDiv.style.display = 'block';
+    newTypeInput.required = true;
+  } else {
+    newTypeDiv.style.display = 'none';
+    newTypeInput.required = false;
+  }
+}
+
+$(document).ready(function () {
+  const $select = $('#tags').selectize({
+    plugins: ['remove_button'],
+    create: true,
+    persist: false,
+    placeholder: 'Etiket seçin veya yazıp Enter ile ekleyin',
+    maxItems: null
+  });
+
+  const tagSelectize = $select[0].selectize;
+
+  $('#add-tag-button').on('click', function () {
+    const newTagName = $('#new-tag-input').val().trim();
+    if (!newTagName) {
+      alert('Lütfen yeni etiket adını giriniz.');
+      return;
+    }
+
+    // Var mı kontrol et (case insensitive)
+    const exists = Object.values(tagSelectize.options).some(opt =>
+      opt.text.toLowerCase() === newTagName.toLowerCase()
+    );
+
+    if (!exists) {
+      const newId = 'new_' + newTagName.toLowerCase().replace(/\s+/g, '-');
+      tagSelectize.addOption({ value: newId, text: newTagName });
+      tagSelectize.refreshOptions();
+      tagSelectize.addItem(newId);
+    } else {
+      // Var olan tagı seç
+      for (const key in tagSelectize.options) {
+        if (tagSelectize.options[key].text.toLowerCase() === newTagName.toLowerCase()) {
+          tagSelectize.addItem(key);
+          break;
+        }
+      }
+    }
+
+    $('#new-tag-input').val('');
+  });
+});
+</script>
+
+<script>
+function selectCategory(category) {
+  document.getElementById('category-input').value = category;
+  // Tüm butonlardan active ve selected classlarını kaldır
+  document.getElementById('btn-demirbas').classList.remove('active', 'selected', 'btn-primary');
+  document.getElementById('btn-sarf').classList.remove('active', 'selected', 'btn-secondary');
+  document.getElementById('btn-demirbas').classList.add('btn-outline-primary');
+  document.getElementById('btn-sarf').classList.add('btn-outline-secondary');
+  // Seçili butona active ve selected classlarını ekle ve renk değiştir
+  if (category === 'demirbas') {
+    document.getElementById('btn-demirbas').classList.add('active', 'selected', 'btn-primary');
+    document.getElementById('btn-demirbas').classList.remove('btn-outline-primary');
+    document.getElementById('btn-sarf').classList.remove('btn-secondary');
+    document.getElementById('btn-sarf').classList.add('btn-outline-secondary');
+  } else {
+    document.getElementById('btn-sarf').classList.add('active', 'selected', 'btn-secondary');
+    document.getElementById('btn-sarf').classList.remove('btn-outline-secondary');
+    document.getElementById('btn-demirbas').classList.remove('btn-primary');
+    document.getElementById('btn-demirbas').classList.add('btn-outline-primary');
+  }
+}
+</script>
+{% endblock %}
+

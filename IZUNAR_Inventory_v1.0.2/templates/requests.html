@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-4">
+  <h2 class="mb-4 text-primary fw-bold">İstek Listesi</h2>
+
+  <form method="post" class="row g-3 mb-5">
+    <div class="col-md-5">
+      <input type="text" name="name" class="form-control form-control-lg" placeholder="Ürün Adı" required>
+    </div>
+    <div class="col-md-5">
+      <input type="text" name="description" class="form-control form-control-lg" placeholder="Açıklama (Opsiyonel)">
+    </div>
+    <div class="col-md-2 d-grid">
+      <button type="submit" class="btn btn-primary btn-lg">Ekle</button>
+    </div>
+  </form>
+
+  <div class="list-group">
+    {% for req in requests %}
+    <div class="list-group-item list-group-item-action mb-2 shadow-sm rounded">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h5 class="mb-1 fw-semibold text-dark">{{ req.name }}</h5>
+          <p class="mb-1 text-muted">{{ req.description or "-" }}</p>
+          <small class="text-secondary">
+            <i class="bi bi-person"></i>
+            {{ req.user.username if req.user else "Bilinmiyor" }}
+          </small>
+        </div>
+        <small class="text-secondary">{{ req.created_at.strftime('%d.%m.%Y') }}</small>
+      </div>
+    </div>
+    {% else %}
+    <p class="text-muted fst-italic">Henüz istek bulunmamaktadır.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

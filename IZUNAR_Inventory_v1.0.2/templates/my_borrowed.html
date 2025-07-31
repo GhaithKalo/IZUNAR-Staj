@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ödünç Aldıklarım</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen p-6">
+
+  <h1 class="text-3xl font-bold mb-8 text-center text-gray-800">Ödünç Aldıklarım</h1>
+
+  <div class="max-w-4xl mx-auto space-y-6">
+
+    {% if borrowed_items %}
+      {% for component, current_borrowed in borrowed_items %}
+        <div class="bg-white shadow-md rounded-lg p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
+          <div class="flex items-center gap-4">
+            <img src="{{ component.image_url }}" alt="{{ component.name }}" class="w-24 h-24 object-contain rounded-md border" />
+            <div>
+              <h2 class="text-xl font-semibold text-gray-900">{{ component.name }}</h2>
+              <p class="text-gray-600">Stokta: {{ component.quantity }} adet</p>
+              <p class="text-gray-600">Ödünç Aldığınız: <span class="font-medium">{{ current_borrowed }}</span> adet</p>
+            </div>
+          </div>
+
+          <form method="post" action="{{ url_for('return_component', comp_id=component.id) }}" class="flex flex-col sm:flex-row gap-3 items-center">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <input
+              type="number"
+              name="amount"
+              min="1"
+              max="{{ current_borrowed }}"
+              required
+              placeholder="Kaç adet iade?"
+              class="w-32 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            />
+            <button type="submit" class="px-5 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition font-semibold">
+              İade Et
+            </button>
+          </form>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="text-center text-gray-500 text-lg">Şu anda iade edilecek ürününüz yok.</p>
+    {% endif %}
+
+  </div>
+
+  <div class="max-w-4xl mx-auto mt-8 text-center">
+    <a href="{{ url_for('index') }}" class="text-blue-600 hover:underline font-semibold">Ana Sayfaya Dön</a>
+  </div>
+
+</body>
+</html>
