@@ -1,0 +1,61 @@
+<div class="col-md-6 col-lg-4 mb-4">
+  <div class="card product-card h-100" onclick="window.location.href='{{ url_for('component_detail', comp_id=component.id) }}'" style="cursor:pointer;">
+    {% if component.image_url %}
+      <img src="{{ url_for('static', filename='uploads/' ~ component.image_url) }}" class="card-img-top img-fluid" alt="{{ component.name }}">
+    {% else %}
+      <img src="{{ url_for('static', filename='images/no-image.png') }}" class="card-img-top img-fluid" alt="Görsel yok">
+    {% endif %}
+
+    <div class="card-body">
+      <h5 class="card-title">{{ component.name }}</h5>
+      <p class="card-text">
+        Tür: {{ component.type or 'Bilinmiyor' }}<br>
+        Kod: {{ component.code or 'Yok' }}<br>
+        Stok: {{ component.quantity }}
+      </p>
+    </div>
+
+    <div class="card-footer" onclick="event.stopPropagation();">
+      {% if current_user.is_authenticated %}
+        {% if component.category == 'sarf' %}
+          <form method="POST" action="{{ url_for('consume_component', comp_id=component.id) }}" class="d-flex align-items-center">
+            <div class="input-group me-2">
+              <button type="button" class="btn btn-outline-secondary" onclick="adjustAmount(this, -1)">-</button>
+              <input name="amount" type="number" class="form-control" value="1" min="1" max="{{ component.quantity }}">
+              <button type="button" class="btn btn-outline-secondary" onclick="adjustAmount(this, 1)">+</button>
+            </div>
+            <button type="submit" class="btn btn-danger btn-sm">Sarf Et</button>
+          </form>
+
+        {% elif component.category == 'demirbas' %}
+          <button class="btn btn-warning btn-sm" onclick="toggleBorrowForm({{ component.id }})">
+            Ödünç Al
+          </button>
+
+          <form method="POST" action="{{ url_for('borrow', comp_id=component.id) }}" id="borrow-form-{{ component.id }}" class="mt-2 d-none">
+            <div class="input-group mb-2">
+              <button type="button" class="btn btn-outline-secondary" onclick="adjustAmount(this, -1)">-</button>
+              <input type="number" name="amount" id="amount-{{ component.id }}" class="form-control text-center" value="1" min="1" max="{{ component.quantity }}" onchange="updateSerialFields({{ component.id }})">
+              <button type="button" class="btn btn-outline-secondary" onclick="adjustAmount(this, 1)">+</button>
+            </div>
+
+            <input type="text" class="form-control mb-2" name="location" placeholder="Örn: Lab 1, Proje X" required>
+
+            <div id="serial-fields-{{ component.id }}">
+              <select name="serial_number" class="form-select mb-2" required>
+                <option value="" disabled selected>Seri numarası seç</option>
+                {% for item in component.inventory_items %}
+                  {% if not item.assigned_to %}
+                    <option value="{{ item.serial_number }}">{{ item.serial_number }}</option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-sm">Ödünç Al</button>
+          </form>
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
+</div>

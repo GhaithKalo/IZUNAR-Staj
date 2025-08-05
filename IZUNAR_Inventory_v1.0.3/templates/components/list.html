@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Bileşenler Listesi</h2>
+
+<div class="row">
+  {% for component in components %}
+    <div class="col-md-4 mb-4">
+      <div class="card h-100">
+        <img src="{{ component.image_url }}" class="card-img-top" alt="{{ component.name }}">
+        <div class="card-body">
+          <h5 class="card-title">{{ component.name }}</h5>
+          <p class="card-text">{{ component.description or "Açıklama yok" }}</p>
+          <p><strong>Tür:</strong> {{ component.type or "Belirtilmemiş" }}</p>
+          <p><strong>Konum:</strong> {{ component.location or "Belirtilmemiş" }}</p>
+          <p><strong>Adet:</strong> {{ component.quantity }}</p>
+        </div>
+      </div>
+    </div>
+  {% else %}
+    <p>Hiç bileşen bulunamadı.</p>
+  {% endfor %}
+</div>
+
+{% endblock %}

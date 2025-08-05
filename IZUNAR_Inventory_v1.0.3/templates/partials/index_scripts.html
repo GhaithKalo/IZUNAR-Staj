@@ -1,0 +1,107 @@
+<script>
+  function toggleProducts(typeId) {
+    const allContainers = document.querySelectorAll('.products-container');
+    allContainers.forEach(container => {
+      if (container.id === 'products-' + typeId) {
+        container.classList.toggle('d-none');
+      } else {
+        container.classList.add('d-none');
+      }
+    });
+
+    const buttons = document.querySelectorAll('button[aria-controls^="products-"]');
+    buttons.forEach(button => {
+      const isTarget = button.getAttribute('aria-controls') === 'products-' + typeId;
+      button.setAttribute('aria-expanded', isTarget && button.getAttribute('aria-expanded') !== 'true');
+    });
+  }
+
+  function adjustAmount(btn, delta) {
+    const input = btn.parentElement.querySelector('input[type=number]');
+    let value = parseInt(input.value) || 1;
+    const max = parseInt(input.max) || 999;
+    value = Math.min(Math.max(value + delta, 1), max);
+    input.value = value;
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('input[type="number"]').forEach(input => {
+      input.addEventListener('input', () => {
+        const compId = input.id.split('-')[1];
+        const consumeInput = document.getElementById('consume-amount-' + compId);
+        if (consumeInput) {
+          consumeInput.value = input.value;
+        }
+      });
+    });
+
+    const searchForm = document.querySelector('form[action="{{ url_for("index") }}"]');
+    if (searchForm) {
+      searchForm.addEventListener('submit', function(e) {
+        const input = this.querySelector('input[name="q"]');
+        if (input && input.value.trim() === '') {
+          e.preventDefault();
+          window.location.href = "{{ url_for('index') }}";
+        }
+      });
+    }
+  });
+
+  function confirmConsume(event, compId, compName) {
+    const amountInput = document.getElementById('amount-' + compId);
+    const amount = amountInput ? amountInput.value : 'belirtilmemiş';
+    return confirm(`${compName} ürününden ${amount} adet sarf etmek üzeresiniz. Emin misiniz?`);
+  }
+
+
+function toggleBorrowForm(compId) {
+  const form = document.getElementById(`borrow-form-${compId}`);
+  const toggleBtn = document.querySelector(`button[onclick="toggleBorrowForm(${compId})"]`);
+
+  if (form.classList.contains('d-none')) {
+    form.classList.remove('d-none');
+    if (toggleBtn) toggleBtn.style.display = 'none'; // Butonu gizle
+    const submitBtn = document.getElementById(`borrow-submit-${compId}`);
+    if (submitBtn) submitBtn.focus();
+  } else {
+    form.classList.add('d-none');
+    if (toggleBtn) toggleBtn.style.display = 'inline-block'; // Butonu tekrar göster
+  }
+}
+
+
+  function adjustAmount(btn, delta) {
+    const input = btn.parentElement.querySelector('input[type=number]');
+    const current = parseInt(input.value) || 1;
+    const max = parseInt(input.max) || 999;
+    const newVal = Math.min(Math.max(current + delta, 1), max);
+    input.value = newVal;
+  }
+
+  function prepareBorrowForm(compId) {
+  const form = document.getElementById(`borrow-form-${compId}`);
+  const serialSelect = document.getElementById(`serial-${compId}`);
+  const selected = Array.from(serialSelect.selectedOptions).map(opt => opt.value);
+
+  // Eğer hiç seçim yapılmadıysa gönderme
+  if (selected.length === 0) {
+    alert("En az bir seri numarası seçmelisiniz.");
+    return false;
+  }
+
+  // Daha önce eklenmişse sil
+  const existingAmount = form.querySelector('input[name="amount"]');
+  if (existingAmount) existingAmount.remove();
+
+  // Seçili seri numarası sayısı kadar amount belirle
+  const hiddenAmount = document.createElement('input');
+  hiddenAmount.type = 'hidden';
+  hiddenAmount.name = 'amount';
+  hiddenAmount.value = selected.length;
+
+  form.appendChild(hiddenAmount);
+
+  return true; // Gönder
+}
+</script>
+

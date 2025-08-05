@@ -1,0 +1,107 @@
+<style>
+  /* Ürün kartları küçültme */
+  .product-card {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+    background-color: #fff;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-width: 338px;
+    max-width: 100%;
+  }
+
+  .product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  .product-card .card-body {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  .product-card .card-footer {
+    flex-shrink: 0;
+    background: #f8f9fa;
+    border-top: 1px solid #eee;
+    min-height: 56px;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  /* Responsive ayarlar */
+  @media (max-width: 992px) {
+    .col-md-6 {
+      max-width: 50% !important;
+    }
+    .col-md-12, .col-12 {
+      max-width: 100% !important;
+    }
+  }
+
+  /* Footer taşmasını engelleme */
+  footer {
+    padding: 1rem;
+    text-align: center;
+    font-size: 0.85rem;
+    white-space: normal;
+    word-wrap: break-word;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Mobil için borrow-form input ve button tam genişlik */
+  @media (max-width: 576px) {
+    .borrow-form {
+      flex-direction: column !important;
+      gap: 0.5rem;
+    }
+
+    .borrow-form input,
+    .borrow-form button {
+      width: 100% !important;
+    }
+
+    .product-card {
+      padding: 0.75rem;
+    }
+
+    .product-card img {
+      max-height: 140px !important;
+    }
+  }
+
+  /* Sayaç input grubu ve butonları küçültme */
+  .amount-input-group {
+    width: 110px !important;
+  }
+  .amount-btn {
+    padding: 0 5px;
+    font-size: 0.85rem;
+  }
+  .amount-input {
+    font-size: 0.85rem;
+    padding: 0 4px;
+  }
+
+  .borrow-form,
+  form.d-inline-block {
+    flex-shrink: 1;
+    min-width: auto;
+  }
+
+  .d-none {
+    display: none !important;
+  }
+  body.modal-open {
+  padding-right: 0 !important;
+  overflow-y: scroll;
+  }
+</style>
+
